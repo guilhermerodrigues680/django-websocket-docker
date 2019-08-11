@@ -1,0 +1,72 @@
+<!-- chat/templates/chat/room.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+</head>
+<body>
+    <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
+    <input id="chat-message-input" type="text" size="100"/><br/>
+    <input id="chat-message-submit" type="button" value="Enviar"/>
+</body>
+
+<!-- Scripts da Pagina -->
+<script>
+    // Recebe da views room_name_json e armazena em roomName:
+    const roomName = {{ room_name_json }};
+    const messageInputDom = document.querySelector('#chat-message-input')
+    const messageSubmitDom = document.querySelector('#chat-message-submit')
+
+    // Inicia a conexao WebSocket:
+    const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/' + roomName + '/');
+
+    // Altera o nome da sala:
+    document.title = `${roomName} - Chat Room`
+
+    // Evento chamado quando a conexao socket e estabilizada.
+    chatSocket.onopen = function(e) {
+        //alert('Conexao Estabilizada!')
+    };
+
+    // Evento chamado ao chegar um mensagem pelo socket.
+    chatSocket.onmessage = function(e) {
+        let data = JSON.parse(e.data);
+        let message = data['message'];
+        const chatLogDom = document.querySelector('#chat-log');
+
+        chatLogDom.value += (message + '\n');
+    };
+
+    // Evento chamado quando o socket é fechado.
+    chatSocket.onclose = function(e) {
+        console.warn('A conexão socket foi fechada!');
+        alert('Conexao Fechada!')
+    };
+
+    // Evento chamado quando há erro com o socket.
+    chatSocket.onerror = function(e) {
+        console.error('Guilherme, Erro com o WebSocket!')
+    }
+
+    messageInputDom.focus();
+    // Essa rotina detecta se a tecla "Enter" foi pressionada
+    messageInputDom.onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            messageSubmitDom.click();
+        }
+    };
+
+    // Ao clicar no botao de enviar envia a mensagem.
+    messageSubmitDom.onclick = function(e) {
+        let messagem = messageInputDom.value;
+
+        chatSocket.send(JSON.stringify({
+            'messagem': messagem
+        }));
+
+        messageInputDom.value = '';
+    };
+
+</script>
+</html>

@@ -1,0 +1,14 @@
+## Byte-compiled / optimized / DLL files
+*.pyc
+*~
+__pycache__
+
+# Environments
+myvenv/*
+!myvenv/.gitkeep
+
+# Outros
+.DS_Store
+
+# Visual Studio Code
+/.vscode
