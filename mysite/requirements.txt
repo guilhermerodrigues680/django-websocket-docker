@@ -1,2 +1,2 @@
-Django
-channels
+Django==2.2.3
+channels==2.2.0
